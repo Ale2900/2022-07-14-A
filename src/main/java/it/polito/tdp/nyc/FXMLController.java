@@ -1,7 +1,10 @@
-package it.polito.tdp.nyc;
+        package it.polito.tdp.nyc;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.nyc.model.Arco;
 import it.polito.tdp.nyc.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +44,7 @@ public class FXMLController {
     private TableColumn<?, ?> clV2; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBorough"
-    private ComboBox<?> cmbBorough; // Value injected by FXMLLoader
+    private ComboBox<String> cmbBorough; // Value injected by FXMLLoader
 
     @FXML // fx:id="tblArchi"
     private TableView<?> tblArchi; // Value injected by FXMLLoader
@@ -56,13 +59,32 @@ public class FXMLController {
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
+
     void doAnalisiArchi(ActionEvent event) {
+    	//che succede se il bottone è schiacciato prima di creare il grafo
+    
+    	List<Arco> archi=this.model.analisiArchi();
+    	
+    	for(Arco a: archi) {
+    		this.txtResult.appendText(a+"\n"); //l'ordinamento ci pensa a farlo il metodo del model
+    		                                   //mentre per quanto riguarda la stampa ho messo un toString() propriod ella classe Arco
+    	}
     	
 
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	//prendiamo il borough dalla tendina
+    	String borough=this.cmbBorough.getValue();
+    	if(borough==null) {
+    		this.txtResult.appendText("Selezionare un Borough");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(borough);
+    	
+    	this.txtResult.appendText("Grafo creato con "+ this.model.nVertici()+ " vertici e "+ this.model.nArchi()+ " archi \n");
     	
     }
 
@@ -90,6 +112,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	
+    	//popoliamo la tendina con la lista di boroughs
+    	this.cmbBorough.getItems().addAll(this.model.getBoroughs());
+    	
     }
 
 }
